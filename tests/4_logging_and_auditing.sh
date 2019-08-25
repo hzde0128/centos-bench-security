@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 check_4() {
-  info "4 - Logging and Auditing"
+  info "4       - Logging and Auditing"
   info "4.1     - Configure System Accounting (auditd)"
   info "4.1.1   - Configure Data Retention"
   test_wrapper 0 "4.1.1.1 - Ensure audit log storage size is configured (Not Scored)" test_audit_log_storage_size

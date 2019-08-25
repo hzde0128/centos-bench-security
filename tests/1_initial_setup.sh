@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 check_1() {
-  info "1 - Initial Setup"
+  info "1       - Initial Setup"
   info "1.1     - Filesystem Configuration"
   info "1.1.1   - Disable unused filesystems"
   test_wrapper 0 "1.1.1.1 - Ensure mounting of cramfs filesystems is disabled (Scored)" test_module_disabled cramfs

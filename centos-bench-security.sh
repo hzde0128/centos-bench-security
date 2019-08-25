@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 # Simple input to skip slow tests
 if [[ "$1" == "--skip-slow" ]]; then
@@ -23,7 +23,7 @@ main () {
   yell "# ------------------------------------------------------------------------------
 # CentOS Bench for Security 
 # 
-# Based on 'CIS CentOS Linux 7 Benchmark v2.1.1 (01-31-2017)'
+# Based on 'CIS_CentOS_Linux_7_Benchmark_v2.2.0 (12-27-2017)'
 # https://www.cisecurity.org/cis-benchmarks/
 #
 # Björn Oscarsson (c) 2017-

@@ -1,7 +1,7 @@
 #!/bin/env bash
 
 check_2() {
-  info "2 - Services"
+  info "2       - Services"
   info "2.1     - inetd Services"
   test_wrapper 0 "2.1.1   - Ensure chargen services are not enabled (Scored)" test_dgram_stream_services_disabled chargen
   test_wrapper 0 "2.1.2   - Ensure daytime services are not enabled (Scored)" test_dgram_stream_services_disabled daytime
