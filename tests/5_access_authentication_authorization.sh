@@ -5,11 +5,11 @@ check_5() {
   info "5.1     - Configure cron"
   test_wrapper 0 "5.1.1   - Ensure cron daemon is enabled (Scored)" test_service_enabled crond
   test_wrapper 0 "5.1.2   - Ensure permissions on /etc/crontab are configured (Scored)" test_permissions_0600_root_root /etc/crontab
-  test_wrapper 0 "5.1.3   - Ensure permissions on /etc/cron.hourly are configured (Scored)" test_permissions_0600_root_root /etc/cron.hourly
-  test_wrapper 0 "5.1.4   - Ensure permissions on /etc/cron.daily are configured (Scored)" test_permissions_0600_root_root /etc/cron.daily
-  test_wrapper 0 "5.1.5   - Ensure permissions on /etc/cron.weekly are configured (Scored)" test_permissions_0600_root_root /etc/cron.weekly
-  test_wrapper 0 "5.1.6   - Ensure permissions on /etc/cron.monthly are configured (Scored)" test_permissions_0600_root_root /etc/cron.monthly
-  test_wrapper 0 "5.1.7   - Ensure permissions on /etc/cron.d are configured (Scored)" test_permissions_0600_root_root /etc/cron.d
+  test_wrapper 0 "5.1.3   - Ensure permissions on /etc/cron.hourly are configured (Scored)" test_permissions_0700_root_root /etc/cron.hourly
+  test_wrapper 0 "5.1.4   - Ensure permissions on /etc/cron.daily are configured (Scored)" test_permissions_0700_root_root /etc/cron.daily
+  test_wrapper 0 "5.1.5   - Ensure permissions on /etc/cron.weekly are configured (Scored)" test_permissions_0700_root_root /etc/cron.weekly
+  test_wrapper 0 "5.1.6   - Ensure permissions on /etc/cron.monthly are configured (Scored)" test_permissions_0700_root_root /etc/cron.monthly
+  test_wrapper 0 "5.1.7   - Ensure permissions on /etc/cron.d are configured (Scored)" test_permissions_0700_root_root /etc/cron.d
   test_wrapper 0 "5.1.8   - Ensure at/cron is restricted to authorized users (Scored)" test_at_cron_auth_users
   info "5.2     - SSH Server Configuration"
   test_wrapper 0 "5.2.1   - Ensure permissions on /etc/ssh/sshd_config are configured (Scored)" test_permissions_0600_root_root /etc/ssh/sshd_config
