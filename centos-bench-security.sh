@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# rpm -q bugfix
+export LANG=en_US.UTF-8
+
 # Simple input to skip slow tests
 if [[ "$1" == "--skip-slow" ]]; then
   export BENCH_SKIP_SLOW=1
