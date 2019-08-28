@@ -30,7 +30,7 @@ check_4() {
   info "4.2.1   - Configure rsyslog"
   test_wrapper $do_skip_rsyslog "4.2.1.1 - Ensure rsyslog Service is enabled (Scored)" test_service_enabled rsyslog
   info "4.2.1.2 - Ensure logging is configured (Not Scored)"
-  todo "4.2.1.3 - Ensure rsyslog default file permissions configured (Scored)"
+  test_wrapper 0 "4.2.1.3 - Ensure rsyslog default file permissions configured (Scored)" test_rsyslog_file_perssion
   test_wrapper $do_skip_rsyslog "4.2.1.4 - Ensure rsyslog is configured to send logs to a remote log host (Scored)" test_rsyslog_content
   todo "4.2.1.5 - Ensure remote rsyslog messages are only accepted on designated log hosts. (Not Scored)"
   test_rpm_installed syslog-ng

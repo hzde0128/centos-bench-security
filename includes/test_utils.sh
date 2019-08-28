@@ -241,6 +241,10 @@ test_permissions_0000_root_root() {
   test_file_perms ${file} 0 || return
 }
 
+test_rsyslog_file_perssion() {
+  egrep -q '^\$FileCreateMode[[:space:]]+0640' /etc/rsyslog.conf /etc/rsyslog.d/*.conf || return
+}
+
 test_gdm_banner_msg() {
   if [[ -f "${BANNER_MSG}" ]] ; then
     egrep '[org/gnome/login-screen]' ${BANNER_MSG} || return
