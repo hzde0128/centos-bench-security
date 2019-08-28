@@ -424,19 +424,17 @@ test_audit_sys_mac() {
 
 test_audit_logins_logouts() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/faillog" || return
-  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
   | egrep -q "\-w[[:space:]]+\/var\/log\/lastlog" || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/tallylog" || return
+  | egrep -q "\-w[[:space:]]+\/var\/run\/faillock\/" || return
 }
 
 test_audit_session_init() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+session" | egrep "\-p[[:space:]]+wa" \
   | egrep -q "\-w[[:space:]]+\/var\/run\/utmp" || return
-  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+session" | egrep "\-p[[:space:]]+wa" \
+  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
   | egrep -q "\-w[[:space:]]+\/var\/log\/wtmp" || return
-  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+session" | egrep "\-p[[:space:]]+wa" \
+  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
   | egrep -q "\-w[[:space:]]+\/var\/log\/btmp" || return
 }
 
