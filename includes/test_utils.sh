@@ -229,6 +229,12 @@ test_permissions_0600_root_root() {
   test_file_perms ${file} 600 || return
 }
 
+test_permissions_0700_root_root() {
+  local file=$1
+  test_root_owns ${file} || return
+  test_file_perms ${file} 700 || return
+}
+
 test_permissions_0000_root_root() {
   local file=$1
   test_root_owns ${file} || return
