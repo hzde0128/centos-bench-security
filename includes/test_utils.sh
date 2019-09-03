@@ -596,6 +596,16 @@ test_at_cron_auth_users() {
   test_permissions_0600_root_root "${AT_ALLOW}" || return
 }
 
+test_pam_pwquality() {
+  egrep pam_pwquality.so ${PASS_AUTH} | egrep try_first_pass | egrep -q retry=3 || return
+  egrep pam_pwquality.so ${SYSTEM_AUTH} | egrep try_first_pass | egrep -q retry=3 || return
+  [[ $(egrep "^minlen[[:space:]]+=[[:space:]]" ${PWQUAL_CNF} | awk '{print $NF}') -ge 14 ]] || return
+  egrep -q "^dcredit[[:space:]]+=[[:space:]]+-1" ${PWQUAL_CNF} || return
+  egrep -q "^ucredit[[:space:]]+=[[:space:]]+-1" ${PWQUAL_CNF} || return
+  egrep -q "^ocredit[[:space:]]+=[[:space:]]+-1" ${PWQUAL_CNF} || return
+  egrep -q "^lcredit[[:space:]]+=[[:space:]]+-1" ${PWQUAL_CNF} || return
+}
+
 test_param() {
   local file="${1}" 
   local parameter="${2}" 

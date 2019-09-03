@@ -28,7 +28,7 @@ check_5() {
   test_wrapper 0 "5.2.14  - Ensure SSH access is limited (Scored)" test_ssh_access
   test_wrapper 0 "5.2.15  - Ensure SSH warning banner is configured (Scored)" test_param "${SSHD_CFG}" Banner /etc/issue.net
   info "5.3     - Configure PAM"
-  todo "5.3.1   - Ensure password creation requirements are configured (Scored)"
+  test_wrapper 0 "5.3.1   - Ensure password creation requirements are configured (Scored)" test_pam_pwquality
   todo "5.3.2   - Ensure lockout for failed password attempts is configured (Scored)"
   todo "5.3.3   - Ensure password reuse is limited (Scored)"
   todo "5.3.4   - Ensure password hashing algorithm is SHA-512 (Scored)"
