@@ -613,6 +613,26 @@ test_password_history() {
   [[ $(egrep  -o "remember=[[:digit:]]+" ${SYSTEM_AUTH} | awk -F'=' '{print $2}') -ge 5 ]] || return
 }
 
+test_password_algorithm() {
+  egrep '^password\s+sufficient\s+pam_unix.so' ${PASS_AUTH} | egrep -q sha512 || return
+  egrep '^password\s+sufficient\s+pam_unix.so' ${SYSTEM_AUTH} | egrep -q sha512 || return
+}
+
+test_password_expiration() {
+  egrep -q "^PASS_MAX_DAYS" ${LOGIN_DEFS} || return
+  [[ $(egrep "^PASS_MAX_DAYS" ${LOGIN_DEFS} | awk '{print $2}') -le 365 ]] || return
+}
+
+test_password_minium_change() {
+  egrep -q "^PASS_MIN_DAYS" ${LOGIN_DEFS} || return
+  [[ $(egrep "^PASS_MIN_DAYS" ${LOGIN_DEFS} | awk '{print $2}') -ge 7 ]] || return
+}
+
+test_password_expiration_warn() {
+  egrep -q "^PASS_WARN_AGE" ${LOGIN_DEFS} || return
+  [[ $(egrep "^PASS_WARN_AGE" ${LOGIN_DEFS} | awk '{print $2}') -ge 7 ]] || return
+}
+
 test_param() {
   local file="${1}" 
   local parameter="${2}" 
