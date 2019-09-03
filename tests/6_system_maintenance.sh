@@ -10,7 +10,7 @@ check_6() {
   test_wrapper 0 "6.1.5   - Ensure permissions on /etc/gshadow are configured (Scored)" test_permissions_0000_root_root ${GSHADOW}
   test_wrapper 0 "6.1.6   - Ensure permissions on /etc/passwd- are configured (Scored)" test_permissions_0644_root_root ${PASSWD}-
   test_wrapper 0 "6.1.7   - Ensure permissions on /etc/shadow- are configured (Scored)" test_permissions_0000_root_root ${SHADOW}-
-  test_wrapper 0 "6.1.8   - Ensure permissions on /etc/group- are configured (Scored)" test_permissions_0600_root_root ${GROUP}-
+  test_wrapper 0 "6.1.8   - Ensure permissions on /etc/group- are configured (Scored)" test_permissions_0644_root_root ${GROUP}-
   test_wrapper 0 "6.1.9   - Ensure permissions on /etc/gshadow- are configured (Scored)" test_permissions_0000_root_root ${GSHADOW}-
   test_wrapper 0 "6.1.10  - Ensure no world writable files exist (Scored)" test_wrld_writable_files
   test_wrapper 0 "6.1.11  - Ensure no unowned files or directories exist (Scored)" test_unowned_files
