@@ -633,6 +633,18 @@ test_password_expiration_warn() {
   [[ $(egrep "^PASS_WARN_AGE" ${LOGIN_DEFS} | awk '{print $2}') -ge 7 ]] || return
 }
 
+test_password_lock() {
+  [[ $(useradd -D | grep INACTIVE | awk -F'=' '{print $2}') -le 30 ]] && [[ $(useradd -D | grep INACTIVE | awk -F'=' '{print $2}') -ne -1 ]] || return
+}
+
+test_password_empty() {
+  [[ $(awk -F':' '($2 == "") {print $1}' /etc/passwd)X == 'X' ]] || return
+}
+
+test_root_group_id() {
+  [[ $(grep "^root:" /etc/passwd | cut -f4 -d:) -eq 0 ]] || return
+}
+
 test_param() {
   local file="${1}" 
   local parameter="${2}" 

@@ -37,10 +37,10 @@ check_5() {
   test_wrapper 0 "5.4.1.1 - Ensure password expiration is 365 days or less (Scored)" test_password_expiration
   test_wrapper 0 "5.4.1.2 - Ensure minimum days between password changes is 7 or more (Scored)" test_password_minium_change
   test_wrapper 0 "5.4.1.3 - Ensure password expiration warning days is 7 or more (Scored)" test_password_expiration_warn
-  todo "5.4.1.4 - Ensure inactive password lock is 30 days or less (Scored)"
+  test_wrapper 0 "5.4.1.4 - Ensure inactive password lock is 30 days or less (Scored)" test_password_lock
   todo "5.4.1.5 - Ensure all user last password change date is in the past (Scored)"
   todo "5.4.2   - Ensure system accounts are non-login (Scored)"
-  todo "5.4.3   - Ensure default group for the root account is GID 0 (Scored)"
+  test_wrapper 0 "5.4.3   - Ensure default group for the root account is GID 0 (Scored)" test_root_group_id
   todo "5.4.4   - Ensure default user umask is 027 or more restrictive (Scored)"
   todo "5.5     - Ensure root login is restricted to system console (Not Scored)"
   todo "5.6     - Ensure access to the su command is restricted (Scored)"
