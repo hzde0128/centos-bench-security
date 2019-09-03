@@ -152,7 +152,7 @@ test_root_owns() {
 
 test_grub_permissions() {
   test_root_owns ${GRUB_CFG}
-  test_file_perms ${GRUB_CFG} 0600
+  test_file_perms ${GRUB_CFG} 600
 }
 
 test_boot_pass() {
