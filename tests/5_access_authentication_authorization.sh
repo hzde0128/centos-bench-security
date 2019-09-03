@@ -30,7 +30,7 @@ check_5() {
   info "5.3     - Configure PAM"
   test_wrapper 0 "5.3.1   - Ensure password creation requirements are configured (Scored)" test_pam_pwquality
   todo "5.3.2   - Ensure lockout for failed password attempts is configured (Scored)"
-  todo "5.3.3   - Ensure password reuse is limited (Scored)"
+  test_wrapper 0 "5.3.3   - Ensure password reuse is limited (Scored)" test_password_history
   todo "5.3.4   - Ensure password hashing algorithm is SHA-512 (Scored)"
   info "5.4     - User Accounts and Environment"
   info "5.4.1   - Set Shadow Password Suite Parameters"

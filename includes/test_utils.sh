@@ -606,6 +606,13 @@ test_pam_pwquality() {
   egrep -q "^lcredit[[:space:]]+=[[:space:]]+-1" ${PWQUAL_CNF} || return
 }
 
+test_password_history() {
+  egrep '^password\s+sufficient\s+pam_unix.so' ${PASS_AUTH} | egrep -q 'remember=' || return
+  [[ $(egrep  -o "remember=[[:digit:]]+" ${PASS_AUTH} | awk -F'=' '{print $2}') -ge 5 ]] || return
+  egrep '^password\s+sufficient\s+pam_unix.so' ${SYSTEM_AUTH} | egrep -q 'remember=' || return
+  [[ $(egrep  -o "remember=[[:digit:]]+" ${SYSTEM_AUTH} | awk -F'=' '{print $2}') -ge 5 ]] || return
+}
+
 test_param() {
   local file="${1}" 
   local parameter="${2}" 
