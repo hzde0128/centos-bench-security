@@ -207,8 +207,8 @@ test_selinux_policy() {
 
 test_unconfined_procs() {
   local ps_out
-  ps_out="$(ps -eZ | egrep 'initrc|unconfined' | egrep -v 'bash|ps|grep')"
-  [[ -n "${ps_out}" ]] || return
+  ps_out="$(ps -eZ | egrep 'initrc' | egrep -vw 'tr|ps|egrep|bash|awk') | tr ':' ' ' | awk '{ print $NF }'"
+  [[ ${ps_out}X == 'X' ]] || return
 }
 
 test_warn_banner() {
