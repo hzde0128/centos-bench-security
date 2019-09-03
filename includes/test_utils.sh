@@ -649,6 +649,11 @@ test_system_account() {
   [[ $(egrep -v "^\+" /etc/passwd | awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<1000 && $7!="/sbin/nologin" && $7!="/bin/false") {print}') == '' ]] || return
 }
 
+test_legacy_entries() {
+  local file="${1}"
+  [[ $(egrep -o '^\+:' $file)X == 'X' ]] || return
+}
+
 test_param() {
   local file="${1}" 
   local parameter="${2}" 

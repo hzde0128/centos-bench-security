@@ -19,9 +19,9 @@ check_6() {
   test_wrapper 0 "6.1.14  - Audit SGID executables (Not Scored)" test_sgid_executables
   info "6.2     - User and Group Settings"
   test_wrapper 0 "6.2.1   - Ensure password fields are not empty (Scored)" test_password_empty
-  todo "6.2.2   - Ensure no legacy \"+\" entries exist in /etc/passwd (Scored)"
-  todo "6.2.3   - Ensure no legacy \"+\" entries exist in /etc/shadow (Scored)"
-  todo "6.2.4   - Ensure no legacy \"+\" entries exist in /etc/group (Scored)"
+  test_wrapper 0 "6.2.2   - Ensure no legacy \"+\" entries exist in /etc/passwd (Scored)" test_legacy_entries ${PASSWD}
+  test_wrapper 0 "6.2.3   - Ensure no legacy \"+\" entries exist in /etc/shadow (Scored)" test_legacy_entries ${SHADOW}
+  test_wrapper 0 "6.2.4   - Ensure no legacy \"+\" entries exist in /etc/group (Scored)" test_legacy_entries ${GROUP}
   todo "6.2.5   - Ensure root is the only UID 0 account (Scored)"
   todo "6.2.6   - Ensure root PATH Integrity (Scored)"
   todo "6.2.7   - Ensure all users' home directories exist (Scored)"
