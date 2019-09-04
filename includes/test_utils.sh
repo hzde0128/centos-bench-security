@@ -64,14 +64,20 @@ test_module_disabled() {
 
 test_separate_partition() {
   local target="${1}"
-  [[ $target = '/tmp' ]] && findmnt -n ${target} | grep -q "${target}" || systemctl unmask tmp.mount && systemctl enable tmp.mount && sed -i 's/^Options=.*/Options=mode=1777,strictatime,noexec,nodev,nosuid/' /usr/lib/systemd/system/tmp.mount && systemctl daemon-reload && systemctl start tmp.mount
+  if [ $target = '/tmp' ]; then
+    findmnt -n ${target} | grep -q "${target}" || systemctl unmask tmp.mount && systemctl enable tmp.mount && sed -i 's/^Options=.*/Options=mode=1777,strictatime,noexec,nodev,nosuid/' /usr/lib/systemd/system/tmp.mount && systemctl daemon-reload && systemctl start tmp.mount
+  fi
   findmnt -n ${target} | grep -q "${target}" || return
 }
 
 test_mount_option() {
   local target="${1}"
   local mnt_option="${2}"
-  findmnt -nlo options ${target} | grep -q "${mnt_option}" || return
+  if [ "${target}" = "/dev/shm" ]; then
+    mount -o remount,${mnt_option} ${target}
+  else
+    findmnt -nlo options ${target} | grep -q "${mnt_option}" || return
+  fi
 }
 
 test_system_file_perms() {
