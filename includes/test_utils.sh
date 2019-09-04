@@ -134,6 +134,9 @@ test_yum_gpgcheck() {
 
 test_rpm_installed() {
   local rpm="${1}"
+  if [ ${rpm} = 'aide' ]; then
+    rpm -q ${rpm} | egrep -q "^${rpm}" || ( yum -q -y install $rpm && /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz' )
+  fi
   rpm -q ${rpm} | grep -qe "^${rpm}" || return
 }
 
