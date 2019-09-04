@@ -64,6 +64,7 @@ test_module_disabled() {
 
 test_separate_partition() {
   local target="${1}"
+  [[ $target = '/tmp' ]] && findmnt -n ${target} | grep -q "${target}" || systemctl unmask tmp.mount && systemctl enable tmp.mount && sed -i 's/^Options=.*/Options=mode=1777,strictatime,noexec,nodev,nosuid/' /usr/lib/systemd/system/tmp.mount && systemctl daemon-reload && systemctl start tmp.mount
   findmnt -n ${target} | grep -q "${target}" || return
 }
 
