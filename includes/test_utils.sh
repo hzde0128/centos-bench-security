@@ -58,7 +58,7 @@ fi
 
 test_module_disabled() {
   local module="${1}"
-  modprobe -n -v ${module} 2>&1 | grep -q "install \+/bin/true" || return 
+  modprobe -n -v ${module} 2>&1 | grep -q "install \+/bin/true" || echo "install ${module} /bin/true" >> ${CIS_CNF} || return 
   lsmod | grep -qv "${module}" || return
 }
 
