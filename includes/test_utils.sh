@@ -670,7 +670,7 @@ test_param() {
   local file="${1}" 
   local parameter="${2}" 
   local value="${3}" 
-  cut -d\# -f1 ${file} | egrep -q "^${parameter}[[:space:]]+${value}" || (egrep -q "^#${parameter}" ${file} && sed -i "s/^#${parameter}.*/${parameter} ${value}/"     ${file}) || (egrep -q "^${parameter}" ${file} && sed -i "s/^${parameter}.*/${parameter} ${value}/g" ${file}) || echo "${parameter} ${value}" >> ${file} || return
+  cut -d\# -f1 ${file} | egrep -q "^${parameter}[[:space:]]+${value}" || (egrep -q "^#${parameter}" ${file} && sed -i "s@^#${parameter}.*@${parameter} ${value}@"     ${file}) || (egrep -q "^${parameter}" ${file} && sed -i "s@^${parameter}.*@${parameter} ${value}@" ${file}) || echo "${parameter} ${value}" >> ${file} || return
 }
 
 test_ssh_param_le() {
