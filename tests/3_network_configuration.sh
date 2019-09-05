@@ -20,7 +20,7 @@ check_3() {
   test_wrapper 0 "3.3.3   - Ensure IPv6 is disabled (Not Scored)" test_ipv6_disabled
   info "3.4     - TCP Wrappers"
   test_wrapper 0 "3.4.1   - Ensure TCP Wrappers is installed (Scored)" test_tcp_wrappers_installed
-  info "3.4.2   - Ensure /etc/hosts.allow is configured (Scored)"
+  todo "3.4.2   - Ensure /etc/hosts.allow is configured (Scored)"
   test_wrapper 0 "3.4.3   - Ensure /etc/hosts.deny is configured (Scored)" test_hosts_deny_content
   test_wrapper 0 "3.4.4   - Ensure permissions on /etc/hosts.allow are configured (Scored)" test_permissions_0644_root_root ${HOSTS_ALLOW}
   test_wrapper 0 "3.4.5   - Ensure permissions on /etc/hosts.deny are 644 (Scored)" test_permissions_0644_root_root ${HOSTS_DENY}

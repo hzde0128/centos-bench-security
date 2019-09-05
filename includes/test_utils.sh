@@ -117,7 +117,7 @@ test_sgid_executables() {
 
 test_service_disable() {
   local service="$1" 
-  systemctl is-enabled "${service}" 2>&1 | egrep -q 'disabled|Failed' || return
+  systemctl is-enabled "${service}" 2>&1 | egrep -q 'disabled|Failed|indirect' || return
 }
 
 test_service_enabled() {
@@ -299,7 +299,7 @@ test_ntp_cfg() {
 
 test_chrony_cfg() {
   cut -d\# -f1 ${CHRONY_CONF} | egrep -q "^[[:space:]]*server" || return
-  cut -d\# -f1 ${CHRONY_SYSCON} | grep "OPTIONS=" | grep -q "\-u chrony" || return
+  cut -d\# -f1 ${CHRONY_SYSCON} | grep "OPTIONS=" | grep -q "\-u chrony" || sed -i '/OPTIONS=/s/""/"-u chrony"/' ${CHRONY_SYSCON} || return
 }
 
 test_nfs_rpcbind_services_disabled() {
@@ -324,15 +324,15 @@ test_rsh_service_disabled() {
 test_net_ipv4_conf_all_default() {
   local suffix=$1
   local value=$2
-  test_sysctl "net.ipv4.conf.all.${suffix}" ${value} || return
-  test_sysctl "net.ipv4.conf.default.${suffix}" ${value} || return
+  test_sysctl "net.ipv4.conf.all.${suffix}" ${value} || (echo "net.ipv4.conf.all.${suffix} = ${value}" >> ${SYSCTL_CNF} && sysctl -p >/dev/null) || return
+  test_sysctl "net.ipv4.conf.default.${suffix}" ${value} || (echo "net.ipv4.conf.default.${suffix} = ${value}" >> ${SYSCTL_CNF} && sysctl -p >/dev/null) || return
 }
 
 test_net_ipv6_conf_all_default() {
   local suffix=$1
   local value=$2
-  test_sysctl "net.ipv6.conf.all.${suffix}" ${value} || return
-  test_sysctl "net.ipv6.conf.default.${suffix}" ${value} || return
+  test_sysctl "net.ipv6.conf.all.${suffix}" ${value} || (echo "net.ipv6.conf.all.${suffix} = ${value}" >> ${SYSCTL_CNF} && sysctl -p >/dev/null) || return
+  test_sysctl "net.ipv6.conf.default.${suffix}" ${value} || (echo "net.ipv6.conf.default.${suffix} = ${value}" >> ${SYSCTL_CNF} && sysctl -p >/dev/null) || return
 }
 
 test_ipv6_disabled() {
@@ -600,8 +600,10 @@ test_var_log_files_permissions() {
 }
 
 test_at_cron_auth_users() {
-  [[ ! -f ${AT_DENY} ]] || return 
-  [[ ! -f ${CRON_DENY} ]] || return 
+  [[ -f ${AT_DENY} ]] || touch ${AT_DENY} || return 
+  [[ -f ${CRON_DENY} ]] || touch ${CRON_DENY} || return 
+  [[ -f ${AT_ALLOW} ]] || touch ${AT_ALLOW} || return
+  [[ -f ${CRON_ALLOW} ]] || touch ${CRON_ALLOW} || return
   test_permissions_0600_root_root "${CRON_ALLOW}" || return
   test_permissions_0600_root_root "${AT_ALLOW}" || return
 }
