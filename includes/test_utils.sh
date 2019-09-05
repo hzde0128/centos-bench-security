@@ -146,18 +146,18 @@ test_rpm_not_installed() {
 }
 
 test_aide_cron() {
-  crontab -u root -l 2>/dev/null | cut -d\# -f1 | grep -q "aide \+--check" || return
+  crontab -u root -l 2>/dev/null | cut -d\# -f1 | grep -q "aide \+--check" || echo '0 5 * * * /usr/sbin/aide --check' >> /var/spool/cron/root || return
 }
 
 test_file_perms() {
   local file="${1}"
   local pattern="${2}"  
-  stat -L -c "%a" ${file} | grep -qE "^${pattern}$" || return
+  stat -L -c "%a" ${file} | grep -qE "^${pattern}$" || chmod ${pattern} ${file} || return
 }
 
 test_root_owns() {
   local file="${1}"
-  stat -L -c "%u %g" ${file} | grep -q '0 0' || return
+  stat -L -c "%u %g" ${file} | grep -q '0 0' || chown root:root ${file} || return
 }
 
 test_grub_permissions() {
