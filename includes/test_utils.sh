@@ -65,7 +65,7 @@ test_module_disabled() {
 test_separate_partition() {
   local target="${1}"
   if [ $target = '/tmp' ]; then
-    findmnt -n ${target} | grep -q "${target}" || systemctl unmask tmp.mount && systemctl enable tmp.mount && sed -i 's/^Options=.*/Options=mode=1777,strictatime,noexec,nodev,nosuid/' /usr/lib/systemd/system/tmp.mount && systemctl daemon-reload && systemctl start tmp.mount
+    findmnt -n ${target} | grep -q "${target}" || systemctl unmask tmp.mount && systemctl enable tmp.mount 2>/dev/null && sed -i 's/^Options=.*/Options=mode=1777,strictatime,noexec,nodev,nosuid/' /usr/lib/systemd/system/tmp.mount && systemctl daemon-reload && systemctl start tmp.mount
   fi
   findmnt -n ${target} | grep -q "${target}" || return
 }
@@ -135,7 +135,7 @@ test_yum_gpgcheck() {
 test_rpm_installed() {
   local rpm="${1}"
   if [ ${rpm} = 'aide' ]; then
-    rpm -q ${rpm} | egrep -q "^${rpm}" || ( yum -q -y install $rpm && /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz' )
+    rpm -q ${rpm} | egrep -q "^${rpm}" || ( yum -q -y install $rpm && /usr/sbin/aide --init -B 'database_out=file:/var/lib/aide/aide.db.gz' >/dev/null 2>&1)
   fi
   rpm -q ${rpm} | grep -qe "^${rpm}" || return
 }
@@ -670,7 +670,7 @@ test_param() {
   local file="${1}" 
   local parameter="${2}" 
   local value="${3}" 
-  cut -d\# -f1 ${file} | egrep -q "^${parameter}[[:space:]]+${value}" || return
+  cut -d\# -f1 ${file} | egrep -q "^${parameter}[[:space:]]+${value}" || (egrep -q "^#${parameter}" ${file} && sed -i "s/^#${parameter}.*/${parameter} ${value}/"     ${file}) || (egrep -q "^${parameter}" ${file} && sed -i "s/^${parameter}.*/${parameter} ${value}/g" ${file}) || echo "${parameter} ${value}" >> ${file} || return
 }
 
 test_ssh_param_le() {
