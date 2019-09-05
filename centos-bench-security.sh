@@ -44,7 +44,7 @@ main () {
   fi
   
   # Basic tools
-  [[ rpm -q net-tools >/dev/null 2>&1 ]] || yum -y -q net-tools
+  [[ rpm -q net-tools >/dev/null ]] || yum -y -q net-tools
 
   for test in tests/*.sh
   do
