@@ -19,6 +19,7 @@ RSYSLOG_CNF='/etc/rsyslog.conf'
 SYSLOGNG_CONF='/etc/syslog-ng/syslog-ng.conf'
 AUDITD_CNF='/etc/audit/auditd.conf'
 AUDIT_RULES='/etc/audit/audit.rules'
+AUDIT_RULES_ORI='/etc/audit/rules.d/audit.rules'
 LOGR_SYSLOG='/etc/logrotate.d/syslog'
 ANACRONTAB='/etc/anacrontab'
 CRONTAB='/etc/crontab'
@@ -392,15 +393,15 @@ test_audit_procs_prior_2_auditd() {
 
 test_audit_date_time() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
-  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES} || return
+  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES} ;  echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES_ORI}|| return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
-  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+stime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES} || return
+  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+stime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES}; echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES_ORI} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b64" \
-  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES} || return
+  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES};echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES_ORI} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b32" \
-  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES} || return
+  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES}; echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES_ORI} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/localtime" || echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES} || return
+  | egrep -q "\-w[[:space:]]+\/etc\/localtime" || (echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES}; echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES_ORI}; service auditd restart >/dev/null} ) || return
 }
 
 test_audit_user_group() {
