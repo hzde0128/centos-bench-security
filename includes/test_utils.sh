@@ -388,7 +388,8 @@ test_keep_all_audit_info() {
 
 test_audit_procs_prior_2_auditd() {
   grep_grub="$(grep "^[[:space:]]*linux" ${GRUB_CFG} | grep -v 'audit=1')"
-  [[ -z "${grep_grub}" ]] || (sed -i -e '/^GRUB_CMDLINE_LINUX/s/"$//;/^GRUB_CMDLINE_LINUX/s/$/ audit=1"/' /etc/default/grub; grub2-mkconfig -o ${GRUB_CFG} 2>/dev    /null) || return
+  [[ -z "${grep_grub}" ]] || (sed -i -e '/^GRUB_CMDLINE_LINUX/s/"$//;/^GRUB_CMDLINE_LINUX/s/$/ audit=1"/' /etc/default/grub; \
+ grub2-mkconfig -o ${GRUB_CFG} 2>/dev/null) || return
 }
 
 test_audit_date_time() {
