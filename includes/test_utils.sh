@@ -376,31 +376,31 @@ test_audit_log_storage_size() {
 }
 
 test_dis_on_audit_log_full() {
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'email' || return
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'action_mail_acct' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'root' || return
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'admin_space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'halt' || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'email' || sed -i '/^space_left_action/s/space_left_action     = [[:alpha:]]*/space_left_action = email/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'action_mail_acct' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'root' || sed -i '/^action_mail_acct/s/action_mail_acct = [[    :alpha:]]*/action_mail_acct = root/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'admin_space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'halt' || sed -i '/^admin_space_left_action/s/admin_s    pace_left_action = [[:alpha:]]*/admin_space_left_action = halt/' ${AUDITD_CNF} || return
 }
 
 test_keep_all_audit_info() {
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'max_log_file_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'keep_logs' || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'max_log_file_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'keep_logs' || sed -i '/^max_log_file_action/s/max_log_fi    le_action = [[:alpha:]]*/max_log_file_action = keep_logs/' ${AUDITD_CNF} || return
 }
 
 test_audit_procs_prior_2_auditd() {
   grep_grub="$(grep "^[[:space:]]*linux" ${GRUB_CFG} | grep -v 'audit=1')"
-  [[ -z "${grep_grub}" ]] || return
+  [[ -z "${grep_grub}" ]] || (sed -i -e '/^GRUB_CMDLINE_LINUX/s/"$//;/^GRUB_CMDLINE_LINUX/s/$/ audit=1"/' /etc/default/grub; grub2-mkconfig -o ${GRUB_CFG} 2>/dev    /null) || return
 }
 
 test_audit_date_time() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
-  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
-  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+stime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+stime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b64" \
-  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b32" \
-  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES} || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/localtime" || return
+  | egrep -q "\-w[[:space:]]+\/etc\/localtime" || echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES} || return
 }
 
 test_audit_user_group() {
