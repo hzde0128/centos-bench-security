@@ -379,13 +379,13 @@ test_audit_log_storage_size() {
 }
 
 test_dis_on_audit_log_full() {
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'email' || sed -i '/^space_left_action/s/space_left_action     = [[:alpha:]]*/space_left_action = email/' ${AUDITD_CNF} || return
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'action_mail_acct' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'root' || sed -i '/^action_mail_acct/s/action_mail_acct = [[    :alpha:]]*/action_mail_acct = root/' ${AUDITD_CNF} || return
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'admin_space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'halt' || sed -i '/^admin_space_left_action/s/admin_s    pace_left_action = [[:alpha:]]*/admin_space_left_action = halt/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'email' || sed -i '/^space_left_action/s/space_left_action = [[:alpha:]]*/space_left_action = email/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'action_mail_acct' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'root' || sed -i '/^action_mail_acct/s/action_mail_acct = [[:alpha:]]*/action_mail_acct = root/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'admin_space_left_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'halt' || sed -i '/^admin_space_left_action/s/admin_space_left_action = [[:alpha:]]*/admin_space_left_action = halt/' ${AUDITD_CNF} || return
 }
 
 test_keep_all_audit_info() {
-  cut -d\# -f2 ${AUDITD_CNF} | grep 'max_log_file_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'keep_logs' || sed -i '/^max_log_file_action/s/max_log_fi    le_action = [[:alpha:]]*/max_log_file_action = keep_logs/' ${AUDITD_CNF} || return
+  cut -d\# -f2 ${AUDITD_CNF} | grep 'max_log_file_action' | cut -d= -f2 | tr -d '[[:space:]]' | grep -q 'keep_logs' || sed -i '/^max_log_file_action/s/max_log_file_action = [[:alpha:]]*/max_log_file_action = keep_logs/' ${AUDITD_CNF} || return
 }
 
 test_audit_procs_prior_2_auditd() {
@@ -394,81 +394,69 @@ test_audit_procs_prior_2_auditd() {
  grub2-mkconfig -o ${GRUB_CFG} 2>/dev/null) || return
 }
 
+update_audit_config() {
+  local parameter="${1}"
+  for file in ${AUDIT_RULES} ${AUDIT_RULES_ORI}; do
+    echo "${parameter}" >> ${file}
+  done
+}
+
 test_audit_date_time() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
   | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
- || (echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' >> ${AUDIT_RULES_ORI}) || return
+ ||  update_audit_config '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-S[[:space:]]+settimeofday" \
   | egrep "\-S[[:space:]]+adjtimex" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+stime" \
  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || \
- (echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' >> ${AUDIT_RULES_ORI}) || return
+ update_audit_config '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b64" \
   | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
- || (echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' >> ${AUDIT_RULES_ORI}) || return
+ || update_audit_config '-a always,exit -F arch=b6    4 -S clock_settime -k time-change' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-F[[:space:]]+arch=b32" \
   | egrep "\-S[[:space:]]+clock_settime" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
- || (echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' >> ${AUDIT_RULES_ORI}) || return
+ || update_audit_config '-a always,exit -F arch=b3    2 -S clock_settime -k time-change' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+time-change" | egrep "\-p[[:space:]]+wa" \
   | egrep -q "\-w[[:space:]]+\/etc\/localtime" \
- || (echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES}; \
- echo '-w /etc/localtime -p wa -k time-change' >> ${AUDIT_RULES_ORI}; service auditd restart >/dev/null} ) || return
+ || update_audit_config '-w /etc/localtime -p wa -k time-change' || return
 }
 
 test_audit_user_group() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+identity" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/group" || (echo '-w /etc/group -p wa -k identity' >> ${AUDIT_RULES}; \
- echo '-w /etc/group -p wa -k identity' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/group" || update_audit_config '-w /etc/group -p wa -k identity' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+identity" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/passwd" || (echo '-w /etc/passwd -p wa -k identity' >> ${AUDIT_RULES}; \
- echo '-w /etc/passwd -p wa -k identity' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/passwd" || update_audit_config '-w /etc/passwd -p wa -k identity' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+identity" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/gshadow" || (echo '-w /etc/gshadow -p wa -k identity' >> ${AUDIT_RULES}; \
- echo '-w /etc/gshadow -p wa -k identity' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/gshadow" || update_audit_config '-w /etc/gshadow -p wa -k identity' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+identity" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/shadow" || (echo '-w /etc/shadow -p wa -k identity' >> ${AUDIT_RULES}; \
- echo '-w /etc/shadow -p wa -k identity' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/shadow" || update_audit_config '-w /etc/shadow -p wa -k identity' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+identity" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/security\/opasswd" || (echo '-w /etc/security/opasswd -p wa -k identity' >> ${AUDIT_RULES}; \
- echo '-w /etc/security/opasswd -p wa -k identity' >> ${AUDIT_RULES_ORI}; service auditd restart >/dev/null) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/security\/opasswd" || update_audit_config '-w /etc/security/opasswd -p wa -k identity' || return
 }
 
 test_audit_network_env() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-S[[:space:]]+sethostname" \
   | egrep "\-S[[:space:]]+setdomainname" | egrep "\-F[[:space:]]+arch=b64" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
- || (echo '-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+ || update_audit_config '-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-S[[:space:]]+sethostname" \
   | egrep "\-S[[:space:]]+setdomainname" | egrep "\-F[[:space:]]+arch=b32" | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
- || (echo '-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale' >> ${AUDIT_RULES}; \
- echo '-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+ || update_audit_config '-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/issue" || (echo '-w /etc/issue -p wa -k system-locale' >>  ${AUDIT_RULES}; \
- echo '-w /etc/issue -p wa -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/issue" || update_audit_config '-w /etc/issue -p wa -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/issue.net" || (echo '-w /etc/issue.net -p wa -k system-locale' >> ${AUDIT_RULES}; \
- echo '-w /etc/issue.net -p wa -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/issue.net" || update_audit_config '-w /etc/issue.net -p wa -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/hosts" || (echo '-w /etc/hosts -p wa -k system-locale' >> ${AUDIT_RULES}; \
- echo '-w /etc/hosts -p wa -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/hosts" || update_audit_config '-w /etc/hosts -p wa -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/sysconfig\/network" || (echo '-w /etc/sysconfig/network -p wa -k system-locale' >>  ${AUDIT_RULES}; \
- echo '-w /etc/sysconfig/network -p wa -k system-locale' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/sysconfig\/network" || update_audit_config '-w /etc/sysconfig/network -p wa -k system-locale' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+system-locale" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\w[[:space:]]+\/etc\/sysconfig\/network-scripts\/" || (echo '-w /etc/sysconfig/network-scripts/ -p wa -k system-locale' >> ${AUDIT_RULES}; \
- echo '-w /etc/sysconfig/network-scripts/ -p wa -k system-locale' >> ${AUDIT_RULES_ORI}; service auditd restart >/dev/null) || return
+  | egrep -q "\w[[:space:]]+\/etc\/sysconfig\/network-scripts\/" || update_audit_config '-w /etc/sysconfig/network-scripts/ -p wa -k system-locale' || return
 }
 
 test_audit_sys_mac() {
 cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+MAC-policy" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/selinux\/" || (echo '-w /etc/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES}; \
- echo '-w /etc/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/etc\/selinux\/" || update_audit_config '-w /etc/selinux/ -p wa -k MAC-policy' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+MAC-policy" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/usr\/share\/selinux\/" || (echo '-w /usr/share/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES}; \
- echo '-w /usr/share/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES_ORI}) || return
+  | egrep -q "\-w[[:space:]]+\/usr\/share\/selinux\/" || update_audit_config '-w /usr/share/selinux/ -p wa -k MAC-policy' || return
 }
 
 test_audit_logins_logouts() {
