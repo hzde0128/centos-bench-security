@@ -461,52 +461,58 @@ cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+MAC-policy" | egrep "\-p[[:s
 
 test_audit_logins_logouts() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/lastlog" || return
+  | egrep -q "\-w[[:space:]]+\/var\/log\/lastlog" || update_audit_config '-w /var/log/lastlog -p wa -k logins' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/run\/faillock\/" || return
+  | egrep -q "\-w[[:space:]]+\/var\/run\/faillock\/" || update_audit_config '-w /var/run/faillock/ -p wa -k logins' || return
 }
 
 test_audit_session_init() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+session" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/run\/utmp" || return
+  | egrep -q "\-w[[:space:]]+\/var\/run\/utmp" || update_audit_config '-w /var/run/utmp -p wa -k session' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/wtmp" || return
+  | egrep -q "\-w[[:space:]]+\/var\/log\/wtmp" || update_audit_config '-w /var/log/wtmp -p wa -k logins' || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+logins" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/btmp" || return
+  | egrep -q "\-w[[:space:]]+\/var\/log\/btmp" || update_audit_config '-w /var/log/btmp -p wa -k logins' || return
 }
 
 test_audit_dac_perm_mod_events() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+chmod" \
   | egrep "\-S[[:space:]]+fchmod" | egrep "\-S[[:space:]]+fchmodat" | egrep "\-F[[:space:]]+arch=b64" \
   | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+chmod" \
   | egrep "\-S[[:space:]]+fchmod" | egrep "\-S[[:space:]]+fchmodat" | egrep "\-F[[:space:]]+arch=b32" \
   | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+chown" \
   | egrep "\-S[[:space:]]+fchown" | egrep "\-S[[:space:]]+fchownat" | egrep "\-S[[:space:]]+fchown" \
   | egrep "\-F[[:space:]]+arch=b64" | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+chown" \
   | egrep "\-S[[:space:]]+fchown" | egrep "\-S[[:space:]]+fchownat" | egrep "\-S[[:space:]]+fchown" \
   | egrep "\-F[[:space:]]+arch=b32" | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
   
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+setxattr" \
   | egrep "\-S[[:space:]]+lsetxattr" | egrep "\-S[[:space:]]+fsetxattr" | egrep "\-S[[:space:]]+removexattr" \
   | egrep "\-S[[:space:]]+lremovexattr" | egrep "\-S[[:space:]]+fremovexattr" | egrep "\-F[[:space:]]+arch=b64" \
   | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+perm_mod" | egrep "\-S[[:space:]]+setxattr" \
   | egrep "\-S[[:space:]]+lsetxattr" | egrep "\-S[[:space:]]+fsetxattr" | egrep "\-S[[:space:]]+removexattr" \
   | egrep "\-S[[:space:]]+lremovexattr" | egrep "\-S[[:space:]]+fremovexattr" | egrep "\-F[[:space:]]+arch=b32" \
   | egrep "\-F[[:space:]]+auid>=1000" | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod' || return
 }
 
 test_unsuc_unauth_acc_attempts() {
@@ -514,25 +520,29 @@ test_unsuc_unauth_acc_attempts() {
   | egrep "\-S[[:space:]]+open" | egrep "\-S[[:space:]]+openat" | egrep "\-S[[:space:]]+truncate" \
   | egrep "\-S[[:space:]]+ftruncate" | egrep "\-F[[:space:]]+arch=b64" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" | egrep "\-F[[:space:]]exit=\-EACCES" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+access" | egrep "\-S[[:space:]]+creat" \
   | egrep "\-S[[:space:]]+open" | egrep "\-S[[:space:]]+openat" | egrep "\-S[[:space:]]+truncate" \
   | egrep "\-S[[:space:]]+ftruncate" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" | egrep "\-F[[:space:]]exit=\-EACCES" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+access" | egrep "\-S[[:space:]]+creat" \
   | egrep "\-S[[:space:]]+open" | egrep "\-S[[:space:]]+openat" | egrep "\-S[[:space:]]+truncate" \
   | egrep "\-S[[:space:]]+ftruncate" | egrep "\-F[[:space:]]+arch=b64" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" | egrep "\-F[[:space:]]exit=\-EPERM" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+access" | egrep "\-S[[:space:]]+creat" \
   | egrep "\-S[[:space:]]+open" | egrep "\-S[[:space:]]+openat" | egrep "\-S[[:space:]]+truncate" \
   | egrep "\-S[[:space:]]+ftruncate" | egrep "\-F[[:space:]]+arch=b32" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" | egrep "\-F[[:space:]]exit=\-EPERM" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access' || return
 
 }
 
