@@ -562,12 +562,14 @@ test_coll_suc_fs_mnts() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+mounts" | egrep "\-S[[:space:]]+mount" \
   | egrep "\-F[[:space:]]+arch=b64" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+mounts" | egrep "\-S[[:space:]]+mount" \
   | egrep "\-F[[:space:]]+arch=b32" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts' || return
 }
 
 test_coll_file_del_events() {
@@ -575,44 +577,49 @@ test_coll_file_del_events() {
   | egrep "\-F[[:space:]]+arch=b64" | egrep "\-S[[:space:]]+unlinkat" | egrep "\-S[[:space:]]+rename" \
   | egrep "\-S[[:space:]]+renameat" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+delete" | egrep "\-S[[:space:]]+unlink" \
   | egrep "\-F[[:space:]]+arch=b32" | egrep "\-S[[:space:]]+unlinkat" | egrep "\-S[[:space:]]+rename" \
   | egrep "\-S[[:space:]]+renameat" | egrep "\-F[[:space:]]+auid>=1000" \
   | egrep "\-F[[:space:]]+auid\!=4294967295" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b32 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete' || return
 
 }
 
 test_coll_chg2_sysadm_scope() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+scope" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/sudoers" || return
+  | egrep -q "\-w[[:space:]]+\/etc\/sudoers" || update_audit_config '-w /etc/sudoers -p wa -k scope' || return
+  cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+scope" | egrep "\-p[[:space:]]+wa" \
+  | egrep -q "\-w[[:space:]]+\/etc\/sudoers.d\/" || update_audit_config '-w /etc/sudoers.d/ -p wa -k scope' || return
 
 }
 
 test_coll_sysadm_actions() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+actions" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/var\/log\/sudo.log" || return
+  | egrep -q "\-w[[:space:]]+\/var\/log\/sudo.log" || update_audit_config '-w /var/log/sudo.log -p wa -k actions' || return
 }
 
 test_kmod_lod_unlod() {
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+modules" | egrep "\-p[[:space:]]+x" \
-  | egrep -q "\-w[[:space:]]+\/sbin\/insmod" || return
+  | egrep -q "\-w[[:space:]]+\/sbin\/insmod" || update_audit_config '-w /sbin/insmod -p x -k modules' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+modules" | egrep "\-p[[:space:]]+x" \
-  | egrep -q "\-w[[:space:]]+\/sbin\/rmmod" || return
+  | egrep -q "\-w[[:space:]]+\/sbin\/rmmod" || update_audit_config '-w /sbin/rmmod -p x -k modules' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+modules" | egrep "\-p[[:space:]]+x" \
-  | egrep -q "\-w[[:space:]]+\/sbin\/modprobe" || return
+  | egrep -q "\-w[[:space:]]+\/sbin\/modprobe" || update_audit_config '-w /sbin/modprobe -p x -k modules' || return
 
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+modules" | egrep "\-S[[:space:]]+delete_module" \
   | egrep "\-F[[:space:]]+arch=b64" | egrep "\-S[[:space:]]+init_module" \
-  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" || return
+  | egrep -q "\-a[[:space:]]+always,exit|\-a[[:space:]]+exit,always" \
+ || update_audit_config '-a always,exit -F arch=b64 -S init_module -S delete_module -k modules' || return
 }
 
 test_audit_cfg_immut() {
-  cut -d\# -f1 ${AUDIT_RULES} | egrep -q "^-e[[:space:]]+2" || return
+  cut -d\# -f1 ${AUDIT_RULES} | egrep -q "^-e[[:space:]]+2" || update_audit_config '-e 2' || return
 }
 
 test_rsyslog_content() {
