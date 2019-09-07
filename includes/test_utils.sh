@@ -337,7 +337,9 @@ test_net_ipv6_conf_all_default() {
 }
 
 test_ipv6_disabled() {
-  modprobe -c | egrep -q '[[:space:]]*options[[:space:]]+ipv6[[:space:]]+disable=1' || return
+  grep_grub="$(grep "^[[:space:]]*linux" ${GRUB_CFG} | grep -v 'ipv6.disable=1')"
+  [[ -z "${grep_grub}" ]] || (sed -i -e '/^GRUB_CMDLINE_LINUX/s/"$//;/^GRUB_CMDLINE_LINUX/s/$/ ipv6.disable=1"/' /etc/default/grub; \
+  grub2-mkconfig -o ${GRUB_CFG} 2>/dev/null) || return
 }
 
 test_tcp_wrappers_installed() {
