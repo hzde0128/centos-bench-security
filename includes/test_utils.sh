@@ -255,7 +255,8 @@ test_permissions_0000_root_root() {
 }
 
 test_rsyslog_file_perssion() {
-  egrep -q '^\$FileCreateMode[[:space:]]+0640' /etc/rsyslog.conf /etc/rsyslog.d/*.conf || return
+  egrep -q '^\$FileCreateMode[[:space:]]+0640' /etc/rsyslog.conf /etc/rsyslog.d/*.conf \
+ || sed -i '/GLOBAL/a\$FileCreateMode 0640' /etc/rsyslog.conf || return
 }
 
 test_gdm_banner_msg() {
@@ -638,7 +639,8 @@ test_rsyslog_syslogng_installed() {
 }
 
 test_var_log_files_permissions() {
-  [[ $(find /var/log -type f -ls | grep -v "\-r\-\-\-\-\-\-\-\-" | grep -v "\-rw\-\-\-\-\-\-\-" | grep -v "\-rw\-r\-\-\-\-\-" | wc -l) -eq 0 ]] || return
+  [[ $(find /var/log -type f -ls | grep -v "\-r\-\-\-\-\-\-\-\-" | grep -v "\-rw\-\-\-\-\-\-\-" | grep -v "\-rw\-r\-\-\-\-\-" | wc -l) -eq 0 ]] \
+ || find /var/log -type f -exec chmod g-wx,o-rwx {} + || return
 }
 
 test_at_cron_auth_users() {
