@@ -222,7 +222,12 @@ test_unconfined_procs() {
 test_warn_banner() {
   local banner
   banner="$(egrep '(\\v|\\r|\\m|\\s)' ${1})"
-  [[ -z "${banner}" ]] || return
+  [[ -z "${banner}" ]] || echo '*********************************************************************
+* This is an COMPANY system, restricted  to authorized individuals. *
+* This system is subject to monitoring. By logging into this system *
+* you agree to have all your communications monitored. Unauthorized *
+* users, access, and/or  modification will be prosecuted.           *
+*********************************************************************' > ${1} || return
 }
 
 test_permissions_0644_root_root() {
