@@ -463,8 +463,12 @@ test_audit_network_env() {
 }
 
 test_audit_sys_mac() {
+cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+MAC-policy" | egrep "\-p[[:space:]]+wa" \
+  | egrep -q "\-w[[:space:]]+\/etc\/selinux\/" || (echo '-w /etc/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES}; \
+ echo '-w /etc/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES_ORI}) || return
   cut -d\# -f1 ${AUDIT_RULES} | egrep "\-k[[:space:]]+MAC-policy" | egrep "\-p[[:space:]]+wa" \
-  | egrep -q "\-w[[:space:]]+\/etc\/selinux\/" || return
+  | egrep -q "\-w[[:space:]]+\/usr\/share\/selinux\/" || (echo '-w /usr/share/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES}; \
+ echo '-w /usr/share/selinux/ -p wa -k MAC-policy' >> ${AUDIT_RULES_ORI}) || return
 }
 
 test_audit_logins_logouts() {
