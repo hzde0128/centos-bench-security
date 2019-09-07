@@ -188,11 +188,8 @@ test_sysctl() {
 }
 
 test_restrict_core_dumps() {
-  egrep -q "\*{1}[[:space:]]+hard[[:space:]]+core[[:space:]]+0" "${LIMITS_CNF}" || return
-  for f in /etc/security/limits.d/*; do
-    egrep -q "\*{1}[[:space:]]+hard[[:space:]]+core[[:space:]]+0" "${f}" || return
-  done
-  test_sysctl fs.suid_dumpable 0 || return 
+  egrep -q "\*{1}[[:space:]]+hard[[:space:]]+core[[:space:]]+0" "${LIMITS_CNF}" /etc/security/limits.d/* || echo '* hard core 0' >> ${LIMITS_CNF} || return
+  test_sysctl fs.suid_dumpable 0 || (echo 'fs.suid_dumpable = 0' >> ${SYSCTL_CNF}; sysctl -p >/dev/null) || return 
 }
 
 test_xd_nx_support_enabled() {
