@@ -676,17 +676,23 @@ test_password_algorithm() {
 
 test_password_expiration() {
   egrep -q "^PASS_MAX_DAYS" ${LOGIN_DEFS} || return
-  [[ $(egrep "^PASS_MAX_DAYS" ${LOGIN_DEFS} | awk '{print $2}') -le 365 ]] || return
+  local actual_value
+  actual_value=$(egrep "^PASS_MAX_DAYS" ${LOGIN_DEFS} | awk '{print $2}')
+  [[ ${actual_value} -le 365 ]] || sed -i "/^PASS_MAX_DAYS/s/${actual_value}/365/" ${LOGIN_DEFS} || return
 }
 
 test_password_minium_change() {
   egrep -q "^PASS_MIN_DAYS" ${LOGIN_DEFS} || return
-  [[ $(egrep "^PASS_MIN_DAYS" ${LOGIN_DEFS} | awk '{print $2}') -ge 7 ]] || return
+  local actual_value
+  actual_value=$(egrep "^PASS_MIN_DAYS" ${LOGIN_DEFS} | awk '{print $2}')
+  [[ ${actual_value} -ge 7 ]] || sed -i "/^PASS_MIN_DAYS/s/${actual_value}/7/" ${LOGIN_DEFS} || return
 }
 
 test_password_expiration_warn() {
   egrep -q "^PASS_WARN_AGE" ${LOGIN_DEFS} || return
-  [[ $(egrep "^PASS_WARN_AGE" ${LOGIN_DEFS} | awk '{print $2}') -ge 7 ]] || return
+  local actual_value
+  actual_value=$(egrep "^PASS_WARN_AGE" ${LOGIN_DEFS} | awk '{print $2}')
+  [[ ${actual_value} -ge 7 ]] || sed -i "/^PASS_WARN_AGE/s/${actual_value}/7/" ${LOGIN_DEFS} || return
 }
 
 test_password_lock() {
